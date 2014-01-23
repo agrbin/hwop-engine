@@ -1,0 +1,6 @@
+[submodule "svgtex"]
+	path = svgtex
+	url = git://github.com/agrbin/svgtex
+[submodule "libphutil"]
+	path = libphutil
+	url = git://github.com/facebook/libphutil
