@@ -1,0 +1,13 @@
+= test =
+
+this is $2^xxx$ latex.
+
+$$
+this too.
+$$
+
+graph {
+  hello - world
+}
+
+== complete test.

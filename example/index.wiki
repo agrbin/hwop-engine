@@ -1,0 +1,6 @@
+= index
+
+[[a/|this is a]]
+
+[[b/|this is b]]
+

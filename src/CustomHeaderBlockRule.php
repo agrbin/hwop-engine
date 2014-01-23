@@ -1,0 +1,147 @@
+<?php
+
+/**
+ * This class is copied from libphutil because someone thinked that 'final'
+ * would be a great idea to use here..
+ *
+ * Only change is in the markupText() method where I add partition metadata.
+ *
+ * @group markup
+ */
+final class CustomHeaderBlockRule
+  extends PhutilRemarkupEngineBlockRule {
+
+  const KEY_HEADER_TOC = 'headers.toc';
+
+  public function getBlockPattern() {
+    return '/^(={1,5})(.*?)\\1?\s*$/';
+  }
+
+  public function shouldMergeBlocks() {
+    return false;
+  }
+
+  public function getMatchingLineCount(array $lines, $cursor) {
+    return !!preg_match($this->getBlockPattern(), $lines[$cursor]);
+  }
+
+  public function markupText($text) {
+    $text = trim($text);
+    $original_line = $text;
+
+    $level = 1;
+    for ($ii = 0; $ii < min(5, strlen($text)); $ii++) {
+      if ($text[$ii] == '=') {
+        ++$level;
+      } else {
+        break;
+      }
+    }
+    $text = trim($text, ' =');
+
+    $engine = $this->getEngine();
+
+    // add this paragraf to partition metadata information.
+    $part = $engine->getTextMetadata("partition", array());
+    $mark = "<!--h".count($part)."-->";
+    $part[] = array($original_line, $level - 1, $mark);
+    $engine->setTextMetadata("partition", $part);
+
+    $use_anchors = $engine->getConfig('header.generate-toc');
+
+    $anchor = null;
+    if ($use_anchors) {
+      $anchor = $this->generateAnchor($level - 1, $text);
+    }
+
+    $text = phutil_safe_html("$mark" . phutil_tag(
+      'h'.$level,
+      array(),
+      array($anchor, $this->applyRules($text))));
+
+    return $engine->storeText($text);
+  }
+
+  private function generateAnchor($level, $text) {
+    $anchor = HWOPSlug::slugify($text);
+    $base = $anchor;
+
+    $key = self::KEY_HEADER_TOC;
+    $engine = $this->getEngine();
+    $anchors = $engine->getTextMetadata($key, array());
+
+    $suffix = 1;
+    while (!strlen($anchor) || isset($anchors[$anchor])) {
+      $anchor = $base.'-'.$suffix;
+      $anchor = trim($anchor, '-');
+      $suffix++;
+    }
+
+    // When a document contains a link inside a header, like this:
+    //
+    //  = [[ http://wwww.example.com/ | example ]] =
+    //
+    // ...we want to generate a TOC entry with just "example", but link the
+    // header itself. We push the 'toc' state so all the link rules generate
+    // just names.
+    $engine->pushState('toc');
+      $text = $this->applyRules($text);
+      $text = $engine->restoreText($text);
+
+      $anchors[$anchor] = array($level, $text);
+    $engine->popState('toc');
+
+    $engine->setTextMetadata($key, $anchors);
+
+    return phutil_tag(
+      'a',
+      array(
+        'name' => $anchor,
+      ),
+      '');
+  }
+
+  public static function renderTableOfContents(PhutilRemarkupEngine $engine) {
+
+    $key = self::KEY_HEADER_TOC;
+    $anchors = $engine->getTextMetadata($key, array());
+
+    if (count($anchors) < 2) {
+      // Don't generate a TOC if there are no headers, or if there's only
+      // one header (since such a TOC would be silly).
+      return null;
+    }
+
+    $depth = 0;
+    $toc = array();
+    foreach ($anchors as $anchor => $info) {
+      list($level, $name) = $info;
+
+      while ($depth < $level) {
+        $toc[] = hsprintf('<ul>');
+        $depth++;
+      }
+      while ($depth > $level) {
+        $toc[] = hsprintf('</ul>');
+        $depth--;
+      }
+
+      $toc[] = phutil_tag(
+        'li',
+        array(),
+        phutil_tag(
+          'a',
+          array(
+            'href' => '#'.$anchor,
+          ),
+          $name));
+    }
+    while ($depth > 0) {
+      $toc[] = hsprintf('</ul>');
+      $depth--;
+    }
+
+    return phutil_implode_html("\n", $toc);
+  }
+
+}

@@ -1,0 +1,76 @@
+#!/usr/bin/env php
+<?php
+
+require("libphutil/scripts/__init_script__.php");
+require("src/HWOPMarkupEngine.php");
+require("src/WikiBuilder.php");
+require("src/warmup.php");
+
+$args = new PhutilArgumentParser($argv);
+$args->setTagline('HWOP markup engine.');
+$args->setSynopsis(<<<EOHELP
+Builds the wiki to html.
+EOHELP
+);
+
+$test_workflow = id(new PhutilArgumentWorkflow())
+  ->setName('test')
+  ->setExamples('**test**')
+  ->setSynopsis('Test all modules (graphiz, svgtex, libhputil).');
+
+$build_workflow = id(new PhutilArgumentWorkflow())
+  ->setName('build')
+  ->setExamples('**build** --src=example --dst=htdocs')
+  ->setSynopsis('Builds .wiki files into .html.')
+  ->setArguments(
+    array(
+      array(
+        'name'       => 'src',
+        'param'       => 'src',
+        'short'      => 's',
+        'help'       => 'Input directory with .wiki files.',
+      ),
+      array(
+        'name'       => 'dst',
+        'param'       => 'dst',
+        'short'      => 'd',
+        'help'       => 'Output directory. This will be rewritten.',
+      ),
+    ));
+
+$flow = $args->parseWorkflows(
+  array(
+    $test_workflow,
+    $build_workflow,
+    new PhutilHelpArgumentWorkflow(),
+  ));
+
+function normalize_dirname($dir) {
+  if (!$dir) {
+    echo "Provide --src and --dst.\n";
+    exit(1);
+  }
+  if (substr($dir, -1) != '/') {
+    $dir .= '/';
+  }
+  if (!is_dir($dir)) {
+    system("mkdir -p $dir");
+  }
+  if (!is_dir($dir)) {
+    echo "$dir is not a directory.\n";
+    exit(1);
+  }
+  return $dir;
+}
+
+switch ($flow->getName()) {
+  case 'test':
+    test_all();
+    break;
+
+  case 'build':
+    $src = normalize_dirname($args->getArg('src'));
+    $dst = normalize_dirname($args->getArg('dst'));
+    new WikiBuilder($src, $dst, array());
+    break;
+}
