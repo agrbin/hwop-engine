@@ -11,10 +11,12 @@ class WikiBuilder {
     <link rel="stylesheet" href="/css/style.css" />
     <title>%%title%%</title>
   </head>
-  <body>
+  <body class="markup">
+    <div class="markup-container">
 EOHEADER;
 
   private $footer = <<<EOFOOTER
+    </div>
   </body>
 </html>
 EOFOOTER;
@@ -55,13 +57,16 @@ EOFOOTER;
 
   private function discoverFiles() {
     $files = shell_exec("find $this->dst -type f -name \*.wiki");
-    $this->files = explode("\n", trim($files));
+    $this->files = array_filter(explode("\n", trim($files)));
   }
 
   private function buildWiki() {
     foreach ($this->files as $in_file) {
       assert(substr($in_file, -5) == ".wiki");
-      $out_file = substr($in_file, 0, strlen($in_file) - 5) . ".html";
+      $out_file = substr($in_file, 0, strlen($in_file) - 5);
+      system("mkdir -p $out_file");
+      system("cp $in_file $out_file/source.txt");
+      $out_file .= "/index.html";
       $content = file_get_contents($in_file);
       $desc_file = "  " . substr($in_file, strlen($this->dst));
 

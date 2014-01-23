@@ -20,7 +20,7 @@ class LatexRenderer {
       self::$instance = new LatexRenderer();
     }
     if ($mode === "display") {
-      $src = "\\displaystyle{$src}";
+      $src = "\\displaystyle\{$src\}";
     }
     return self::$instance->callRender($src);
   }
@@ -82,7 +82,7 @@ class LatexRenderer {
         2 => array("file", "/dev/null", "w")
       ),
       $pipes,
-      'svgtex' // working dir is where main.js is
+      dirname(__FILE__) . '/../svgtex' // working dir is where main.js is
     );
     if ($this->proc === false) {
       throw new Exception("failed to open latex process.");

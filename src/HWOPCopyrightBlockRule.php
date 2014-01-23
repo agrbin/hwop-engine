@@ -39,7 +39,7 @@ final class HWOPCopyrightBlockRule
   }
 
   public function markupText($text) {
-    $text = str_replace("!!!", "", $text);
+    $text = trim(str_replace("!!!", "", $text));
     if (!$text) {
       return null;
     }
