@@ -65,7 +65,7 @@ EOFOOTER;
       assert(substr($in_file, -5) == ".wiki");
       $out_file = substr($in_file, 0, strlen($in_file) - 5);
       system("mkdir -p $out_file");
-      system("cp $in_file $out_file/source.txt");
+      system("mv $in_file $out_file/source.txt");
       $out_file .= "/index.html";
       $content = file_get_contents($in_file);
       $desc_file = "  " . substr($in_file, strlen($this->dst));
