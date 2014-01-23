@@ -7,7 +7,7 @@ this too.
 $$
 
 graph {
-  hello - world
+  hello - world;
 }
 
 == complete test.

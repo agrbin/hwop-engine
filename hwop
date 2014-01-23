@@ -26,15 +26,21 @@ $build_workflow = id(new PhutilArgumentWorkflow())
     array(
       array(
         'name'       => 'src',
-        'param'       => 'src',
+        'param'      => 'src',
         'short'      => 's',
         'help'       => 'Input directory with .wiki files.',
       ),
       array(
         'name'       => 'dst',
-        'param'       => 'dst',
+        'param'      => 'dst',
         'short'      => 'd',
         'help'       => 'Output directory. This will be rewritten.',
+      ),
+      array(
+        'name'       => 'header',
+        'param'      => 'header',
+        'short'      => 'h',
+        'help'       => 'Filename to prepend to each html. Default exists.'
       ),
     ));
 
@@ -71,6 +77,8 @@ switch ($flow->getName()) {
   case 'build':
     $src = normalize_dirname($args->getArg('src'));
     $dst = normalize_dirname($args->getArg('dst'));
-    new WikiBuilder($src, $dst, array());
+    new WikiBuilder($src, $dst, array(
+      "header" => $args->getArg('header')
+    ));
     break;
 }

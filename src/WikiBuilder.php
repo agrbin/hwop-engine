@@ -30,15 +30,21 @@ EOFOOTER;
   /**
    * src and dst are folders.
    */
-  public function __construct($src, $dst, $opt) {
-    $this->src = $src;
+  public function __construct($src, $dst, $opt) { $this->src = $src;
     $this->dst = $dst;
     $this->opt = $opt;
+    $this->initialize();
     $this->engine = new HWOPMarkupEngine();
     foreach ($this->msgs as $method => $msg) {
       $t = microtime(1);
       $this->$method();
       printf("%s done in %.2lf.\n", $method, microtime(1) - $t);
+    }
+  }
+
+  private function initialize() {
+    if ($this->opt['header']) {
+      $this->header = file_get_contents($this->opt['header']);
     }
   }
 
@@ -76,8 +82,8 @@ EOFOOTER;
 
   private function makeHtml($result, $title) {
     $html = $result['html'];
-    $html = str_replace("%%title%%", $title, $html);
-    return $this->header . $html . $this->footer;
+    $header = str_replace("%%title%%", $title, $this->header);
+    return $header . $html . $this->footer;
   }
 
   private function getTitleFromHeaders($headers, $default) {
