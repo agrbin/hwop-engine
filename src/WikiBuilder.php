@@ -21,9 +21,10 @@ EOHEADER;
 </html>
 EOFOOTER;
 
-  private $src, $dst, $opt, $files;
+  private $src, $dst, $opt, $files, $cache;
 
   private $msgs = array(
+    "buildCache" => "scaning destination folder for existing markups.",
     "prepareDstFolder" => "rm -rf destination and clone source to destination.",
     "discoverFiles" => "searching for all .wiki files and reading in.",
     "buildWiki" => "build everything."
@@ -50,6 +51,15 @@ EOFOOTER;
     }
   }
 
+  private function buildCache() {
+    $files = shell_exec("find $this->dst -type f -name index.html");
+    $files = array_filter(explode("\n", trim($files)));
+    foreach ($files as $file) {
+      $src = substr($file, 0, -strlen("index.html")) . "source.txt";
+      $this->cache[ md5(file_get_contents($src)) ] = file_get_contents($file);
+    }
+  }
+
   private function prepareDstFolder() {
     system("rm -rf $this->dst");
     system("cp -r $this->src $this->dst");
@@ -58,6 +68,23 @@ EOFOOTER;
   private function discoverFiles() {
     $files = shell_exec("find $this->dst -type f -name \*.wiki");
     $this->files = array_filter(explode("\n", trim($files)));
+  }
+
+  private function wikiToHtml($wiki, $in_file, $desc_file) {
+    if (isset($this->cache[md5($wiki)])) {
+      return $this->cache[md5($wiki)];
+    }
+    try {
+      $result = $this->engine->fullRender($wiki, array());
+    } catch (Exception $ex) {
+      echo $desc_file . ": " . $ex->getMessage(), "\n";
+      continue;
+    }
+    $meta = $result['metadata'];
+    $title = $this->getTitleFromHeaders($meta['headers.toc'], $in_file);
+    $html = $this->makeHtml($result, $title);
+    echo $desc_file . ": ok.\n";
+    return $html;
   }
 
   private function buildWiki() {
@@ -70,18 +97,7 @@ EOFOOTER;
       $content = file_get_contents($in_file);
       system("mv $in_file $out_dir/source.txt");
       $desc_file = "  " . substr($in_file, strlen($this->dst));
-
-      try {
-        $result = $this->engine->fullRender($content, array());
-      } catch (Exception $ex) {
-        echo $desc_file . ": " . $ex->getMessage(), "\n";
-        continue;
-      }
-
-      $meta = $result['metadata'];
-      $title = $this->getTitleFromHeaders($meta['headers.toc'], $in_file);
-      $html = $this->makeHtml($result, $title);
-      echo $desc_file . ": ok.\n";
+      $html = $this->wikiToHtml($content, $in_file, $desc_file);
       file_put_contents($out_file, $html);
     }
   }
