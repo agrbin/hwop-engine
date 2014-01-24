@@ -1,0 +1,6 @@
+= test slika
+
+
+{img a.png}
+
+{img a.png,layout=right,float,size=full}

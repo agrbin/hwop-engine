@@ -7,6 +7,7 @@ require "HWOPDotBlockRule.php";
 
 // latex
 require "HWOPRuleLatex.php";
+require "HWOPRuleImage.php";
 require "HWOPMultilineLatexBlockRule.php";
 
 // customs.
@@ -44,6 +45,7 @@ class HWOPMarkupEngine {
     $rules[] = new PhutilRemarkupRuleHyperlink();
     $rules[] = new HWOPRuleLink();
     $rules[] = new HWOPRuleLatex();
+    $rules[] = new HWOPRuleImage();
 
     // first dot, than latex.
 

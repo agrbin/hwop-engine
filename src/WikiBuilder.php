@@ -74,12 +74,7 @@ EOFOOTER;
     if (isset($this->cache[md5($wiki)])) {
       return $this->cache[md5($wiki)];
     }
-    try {
-      $result = $this->engine->fullRender($wiki, array());
-    } catch (Exception $ex) {
-      echo $desc_file . ": " . $ex->getMessage(), "\n";
-      continue;
-    }
+    $result = $this->engine->fullRender($wiki, array());
     $meta = $result['metadata'];
     $title = $this->getTitleFromHeaders($meta['headers.toc'], $in_file);
     $html = $this->makeHtml($result, $title);
@@ -97,7 +92,12 @@ EOFOOTER;
       $content = file_get_contents($in_file);
       system("mv $in_file $out_dir/source.txt");
       $desc_file = "  " . substr($in_file, strlen($this->dst));
-      $html = $this->wikiToHtml($content, $in_file, $desc_file);
+      try {
+        $html = $this->wikiToHtml($content, $in_file, $desc_file);
+      } catch (Exception $ex) {
+        echo $desc_file . ": " . $ex->getMessage(), "\n";
+        continue;
+      }
       file_put_contents($out_file, $html);
     }
   }
