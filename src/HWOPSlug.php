@@ -15,6 +15,7 @@ class HWOPSlug {
     $this->str = $str;
     $this->str = $this->killAccented($this->str);
     $this->str = $this->filterAllowed($this->str);
+    $this->str = strtolower($this->str);
   }
 
   /**
