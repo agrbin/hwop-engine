@@ -20,7 +20,7 @@ class LatexRenderer {
       self::$instance = new LatexRenderer();
     }
     if ($mode === "display") {
-      $src = "\\displaystyle\{$src\}";
+      $src = "\\displaystyle{" . $src . "}";
     }
     return self::$instance->callRender($src);
   }
