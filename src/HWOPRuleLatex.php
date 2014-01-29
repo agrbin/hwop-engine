@@ -48,7 +48,7 @@ final class HWOPRuleLatex
       $embed = phutil_tag(
         'div',
         array(
-          'style' => "text-align: center;"
+          'style' => "text-align: center; margin: 1em;"
         ),
         $img
       );
