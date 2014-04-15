@@ -12,7 +12,7 @@ final class HWOPRuleImage
 
   public function apply($text) {
     return preg_replace_callback(
-      "@{img ([^\.]\.(png|gif|jpg|svg))([^}]+?)?}@",
+      "@{img ([^\.]+\.(png|gif|jpg|svg))([^}]+?)?}@",
       array($this, 'markupImage'),
       $text);
   }
