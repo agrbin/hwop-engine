@@ -9,7 +9,7 @@ Don't forget to initialize submodules!
 git submodule init && git submodule update
 ```
 
-Following packages are dependencies on debian: php5-cli php5-curl php5-apc graphviz
+Following packages are dependencies on debian: `php5-cli php5-curl php-apc graphviz`
 
 Pygments!
 
