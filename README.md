@@ -27,6 +27,14 @@ https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-x86_64.tar
 
 https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-1.9.7-linux-i686.tar.bz2
 
+Make sure that `phantomjs` in use is phantomjs you just downloaded with:
+
+```
+which phantomjs
+```
+
+Should point to something like `phantomjs-1.9.7-linux-i686/bin/phantmojs`.
+
 When all is ready, test your engine with
 
 ```
