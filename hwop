@@ -1,6 +1,11 @@
 #!/usr/bin/env php
 <?php
 
+if (!file_exists("libphutil/README") || !file_exists("svgtex/README.md")) {
+  echo "use 'git submodule init && git submodule update first'\n";
+  exit;
+}
+
 require("libphutil/scripts/__init_script__.php");
 require("src/HWOPMarkupEngine.php");
 require("src/WikiBuilder.php");
