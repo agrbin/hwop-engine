@@ -43,7 +43,6 @@ a -- b -- c -- d;
 !!!
 EOF
   );
-  file_put_contents("/home/agrbin/a.html", $a);
 }
 
 function test_all() {
