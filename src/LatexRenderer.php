@@ -84,10 +84,11 @@ class LatexRenderer {
       $pipes,
       dirname(__FILE__) . '/../svgtex' // working dir is where main.js is
     );
-    if ($this->proc === false) {
+    sleep(2);
+    if ($this->proc === false || !proc_get_status($this->proc)["running"]) {
+      echo "failed to start svgtex server, is phantomjs in path?\n";
       throw new Exception("failed to open latex process.");
     }
-    sleep(2);
     $status = proc_get_status($this->proc);
   }
 
